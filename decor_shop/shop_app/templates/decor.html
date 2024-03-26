@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Декор </title>
+</head>
+<body>
+    <div id="decor-container">
+        {% for product in products %}
+        <p class="decor">
+        {{ product.name }}
+        <div class="media tm-person">
+            <img src="{{ product.image.url }}" alt="Product Image {{ product.name }}" class="img-fluid"  style="display: block; margin: 0 auto;">
+        </div>
+        </p>
+        <a href="#" class="buy-now-button">Buy Now</a>
+        <form action="{% url 'add_to_cart' product.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="buy-now-button">Add to Cart</button>
+        </form>
+        {% endfor %}
+        <h1>Other links:</h1>
+        <h2><a href="{% url 'home'%}"> Home page </a></h2>
+    </div>
+</body>
+</html>

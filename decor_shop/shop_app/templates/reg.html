@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% block auth %}
+<html>
+<head>
+    <title>Registration</title>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username">
+        <input type="text" name="first_name" placeholder="First Name">
+        <input type="text" name="last_name" placeholder="Last Name">
+        <input type="phone" name="phone" placeholder="Phone">
+        <input type="email" name="email" placeholder="Email">
+        <input type="password" name="password1" placeholder="Password">
+        <input type="password" name="password2" placeholder="Confirm Password">
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Shop </title>
+</head>
+<body>
+  <h1>Добро пожаловать на главную страницу</h1>
+  <ul>
+    <h2>Create an account</h2>
+    <button><a href="{% url 'reg' %}">Register</a></button>
+    <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+
+    <p>Logout: <a href="{% url 'logout' %}">Logout</a></p>
+      </header>
+      <li><a href="{% url 'decor' %}">Декор</a></li>
+      <li><a href="{% url 'mebel' %}">Мебель</a></li>
+      <li><a href="{% url 'candel' %}">Свечи</a></li>
+      <li><a href="{% url 'jewely' %}">Украшения</a></li>
+      <li><a href="{% url 'poisk'%}">Поиск товара</a></li>
+  </ul>
+</body>
+</html>

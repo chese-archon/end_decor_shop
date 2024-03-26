@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Каталог </title>
+</head>
+{% load static %}
+    <form method="post" action="{% url 'poisk' %}">
+        {% csrf_token %}
+        <input type="text" name="search_query" placeholder="Найти товар">
+        <input type="submit" value="Найти">
+    </form>
+<!-- Блок для отображения найденных продуктов -->
+    {% if results %}
+        <h2>Результаты поиска для '{{ query }}':</h2>
+        <ul>
+            {% for product in results %}
+                <li>{{ product.name }}</li>  <!-- Вывод информации о продукте, замените на нужные поля -->
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет результатов для '{{ query }}'</p>
+        <img src="{% static 'noresult.jpg' %}" alt="Image" class="img-fluid">
+    {% endif %}
+<body>
+    <p> Найти товар </p>
+
+    <li><a href="{% url 'decor' %}">Декор</a></li>
+    <li><a href="{% url 'mebel' %}">Мебель</a></li>
+    <li><a href="{% url 'candel' %}">Свечи</a></li>
+    <li><a href="{% url 'jewely' %}">Украшения</a></li>
+</body>
+</html>
