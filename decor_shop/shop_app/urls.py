@@ -2,6 +2,8 @@ from . import views
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+from .admin import my_admin_site
+
 urlpatterns = [
     path("", views.indexpage, name="home"),
     path("home/", views.indexpage, name="home"),
@@ -28,6 +30,14 @@ urlpatterns = [
     path("candel/", views.candelpage, name="candel"),
     path("poisk", views.poiskpage, name="poisk"),
     path("poisk/", views.poiskpage, name="poisk"),
+    ##
+    path("email", views.contact_view, name="email"),
+    path("email/", views.contact_view, name="email"),
+    path("adr/", views.adres, name="adr"),
+    path("adr", views.adres, name="adr"),
+    path('create/', views.order_create, name='order_create'),
+    #path('orders/', views.user_orders, name="orders"),
+    #path('orders', views.user_orders, name="orders"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

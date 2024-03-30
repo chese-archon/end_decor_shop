@@ -124,3 +124,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'shop_app.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+RECIPIENTS_EMAIL = ['luda1af@mail.ru']   # список почт получателей по уполчанию
+#DEFAULT_FROM_EMAIL = 'admin@mysite.com'  # замените на свою почту
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'luda1af@mail.ru'
+EMAIL_HOST_PASSWORD = '<your_password>' # Note that this should be the App password rather than your Google account password
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
+CART_SESSION_ID = 'cart'

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Пример отправки сообщений</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+  <h1 class="text-center">Оставьте заявку</h1>
+  <div class="container text-center">
+    <div id="form_container">
+      <form method="post">
+        {% csrf_token %}
+        <input type="text" name="city" placeholder="city">
+        <input type="text" name="street" placeholder="street">
+        <input type="text" name="apartment" placeholder="apartment">
+
+        <div class="form-actions form-group ">
+          <input type="submit" value="Заказать">
+        </div>
+      </form>
+    </div>
+  </div>
+</body>

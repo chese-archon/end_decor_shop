@@ -9,9 +9,6 @@
     <h1>Your Shopping Cart</h1>
 
     <div class="product-list">
-
-
-
     {% for item in cart_items %}
     <div class="product-item">
         <p>{{ item.product.name }} ({{ item.quantity }})</p>
@@ -25,7 +22,9 @@
     </div>
 
     <p>Total Price: ${{ total_price }}</p>
-
+     <a href="{% url 'order_create' %}" class="button">
+    Checkout</a>
+<p>Fhfhfhf</p>
 <a href="{% url 'decor' %}">Continue Shopping</a>
 
 </body>
