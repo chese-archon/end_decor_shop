@@ -12,6 +12,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True)
     first_name = models.CharField(max_length=20, unique=False)
     last_name = models.CharField(max_length=20, unique=False)
+    password = models.CharField(max_length=20, unique=False)
     def create_user(self, first_name, last_name, phone, email, password):
         #self.username = username
         self.first_name = first_name
@@ -19,6 +20,11 @@ class User(AbstractUser):
         self.phone = phone
         self.email = email
         self.set_password(password)
+        self.save()
+
+    def update_paswd(self, new_passwd):
+        #self.password.clean()
+        self.set_password(new_passwd)  # Хэшируем новый пароль
         self.save()
 
 class Product(models.Model):
@@ -76,7 +82,17 @@ class Order(models.Model):
     city = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    total_price = models.IntegerField(default=0)
     paid = models.BooleanField(default=False)
+    #product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    #quantity = models.PositiveIntegerField(default=0)
+
+    def create_order(self, email, address, total_price):
+        self.email = email
+        self.address = address
+        self.total_price = total_price
+        self
+        self.save()
 
     class Meta:
         ordering = ('-created',)
@@ -93,7 +109,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.IntegerField(default=0)
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):

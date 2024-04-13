@@ -9,8 +9,10 @@ from django.http import HttpResponseNotFound
 from django.db.models import Q
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
-from .forms import ContactForm, OrderCreateForm
-from django.contrib.auth import get_user_model
+from .forms import ContactForm, OrderCreateForm, NewPasswordForm
+from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth.forms import PasswordResetForm,PasswordChangeForm
+from django.contrib import messages
 
 def authenticate(request, email=None, password=None):
     UserModel = get_user_model()
@@ -46,7 +48,23 @@ def contact_view(request):
         return HttpResponse('Неверный запрос.')
     return render(request, "email.html", {'form': form})
 
-def adres(request):
+def post_order(request, order, offical_shop_email):#при create order отправляет список заказанных товаров покупателю и владельцу магазина
+    if request.method == "POST":
+        subject = 'заказ за'+order.created +' от decor_shop'
+        from_email = order.email
+        DEFAULT_FROM_EMAIL = offical_shop_email
+        RECIPIENTS_EMAIL = ['admin@gmail.com', 'customer@gmail.com']  #  список почт получателей по уполчанию
+        message = order# информация о заказе
+        try:
+            send_mail(f'{subject} от {from_email}', message,
+                      DEFAULT_FROM_EMAIL, RECIPIENTS_EMAIL)
+        except BadHeaderError:
+            return HttpResponse('Ошибка в теме письма.')
+        return HttpResponse("<h3> Приняли! Спасибо за ваш заказ </h3>")  # return redirect(success_view)#'success')
+    else:
+        return HttpResponse('Неверный запрос.')
+
+def adres(request):# не используется
     if request.method == "GET":
         return render(request, "client_adr.html")
     else:
@@ -94,7 +112,8 @@ def remove_from_cart(request, item_id):
     cart_item.delete()
     return redirect(view_cart)#redirect('cart.html')
 def indexpage(request): # основная (home, /)
-    return render(request, 'home.html')
+    products = Product.objects.all()
+    return render(request, 'home.html', {'products': products})
 
 def poiskpage(request): # поисковая страница + каталог
     if request.method == "GET":# request.method == "POST": GET
@@ -125,7 +144,6 @@ def candelpage(request): # свечи
 def jewelypage(request): # украшения
     products = Product.objects.filter(type="украшения").all()
     return render(request, "jewely.html", {"products": products})
-
 
 def regpage(request):  # регистрация
     if request.method == "GET":
@@ -159,20 +177,41 @@ def regpage(request):  # регистрация
         newuser.save()
         return HttpResponse("<h3>Вы успешно зарегистрировались</h3>")
 
-
 def lkpage(request): # lk, доступ только после регистрации
     if request.method == "GET":
         return render(request, "login.html")
     else:
+        if "Forgot password" in request.POST:
+            pass
+        else:
+            data = request.POST
+            try:
+                user = authenticate(request, email=data['email'], password=data['password'])
+                if user is None:
+                    return HttpResponse(
+                        f"<h3>{data['email'], data['password']}Пользователь с таким логином и паролем не найден</h3>")
+                login(request, user)
+                return HttpResponse("<h3>Вы успешно авторизованы</h3>")
+            except KeyError:
+                return HttpResponse("<h3>Заполните все поля</h3>")
+
+def change_password(request):
+    if request.method == 'POST':
         data = request.POST
+        email = data.get("email")
+        new_password = data.get("password")
         try:
-            user = authenticate(request, email=data['email'], password=data['password'])
-            if user is None:
-                return HttpResponse(f"<h3>{data['email'], data['password']}Пользователь с таким логином и паролем не найден</h3>")
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = None
+        if user:
+            # Установка нового пароля для пользователя
+            user.update_paswd(new_password)
+            user.save()
+            user = authenticate(request, email=email, password=new_password)
             login(request, user)
-            return HttpResponse("<h3>Вы успешно авторизованы</h3>")
-        except KeyError:
-            return HttpResponse("<h3>Заполните все поля</h3>")
+        return HttpResponse("<h3>Вы успешно change_password</h3>")
+    return render(request, 'change_password.html')
 
 def logoutpage(request):
     logout(request)
@@ -181,42 +220,17 @@ def logoutpage(request):
 def cartpage(request):  # корзина, доступ только после регистрации
     return render(request, 'index.html')
 
-def order_create(request):
-    cart = Cart(request)
-    if request.method == 'POST':
-        form = OrderCreateForm(request.POST)
-        if form.is_valid():
-            order = form.save()
-            for item in cart:
-                Order.objects.create(order=order,
-                                     product=item['product'],
-                                     price=item['price'],
-                                     quantity=item['quantity'])
-            # очистка корзины
-            cart.clear()
-            return render(request, 'orders.html',
-                          {'orders': Order.objects.filter(user=request.user)})
-    else:
-        form = OrderCreateForm
-    return render(request, 'orders.html',
-                  {'cart': cart, 'form': form})
 
 def selectedpage(request): # избранное, доступ только после регистрации
     return render(request, 'index.html')
 
 def user_orders(request):
-    if request.method == "GET":
-        orders = Order.objects.filter(user=request.user)
-        if not orders:
-            return render(request, 'orders.html', {'order_items': orders})
-        else:
-            total_price = sum(item.product.price * item.quantity for item in orders)
-            order_date = orders.order_date
-            return render(request, 'orders.html', {'order_items': orders,
-                                               'total_price': total_price,
-                                               'order_date': order_date})
-    else:
-        return render(request, 'orders.html')#redirect(productpage)
+    #orders = Order.objects.all()
+    #return render(request, 'order_view.html', {'order_items': orders})
+    orders = Order.objects.all()
+    #order_items =  OrderItem.objects.filter(order__created=order.created)#OrderItem.objects.filter(user=request.user)
+    #total_price = sum(item.product.price * item.quantity for item in cart_items)
+    return render(request, 'order_view.html', {'orders': orders})#, 'order_items': order_items})
 
 def order_create(request):
     cart = Cart(request)
@@ -224,19 +238,34 @@ def order_create(request):
         form = OrderCreateForm(request.POST)
         if form.is_valid():
             order = form.save()
+            total_price = 0
             for item in cart:
                 OrderItem.objects.create(order=order,
                                          product=item['product'],
                                          price=item['price'],
                                          quantity=item['quantity'])
+                total_price += item['price'] * item['quantity']
+                OrderItem.save()
+                #cart_item, created = CartItem.objects.get_or_create(product=product,
+                #                                        user=request.user)
+                #cart_item.quantity += 1
+                # cart_item.save()
+
             # очистка корзины
-            cart.clear()
+            clean_cart = CartItem.objects.all()
+            for i in clean_cart:
+                i.delete()
+            #clean_cart.save()
+
+            #cart.clear()
             return render(request, 'orders.html',
-                          {'order': order})
+                          {'order': order, 'total_price': total_price, 'cart': cart})
     else:
-        form = OrderCreateForm
+        form = OrderCreateForm#(request.POST)
+        cart = CartItem.objects.filter(user=request.user)
+        total_price = sum(item.product.price * item.quantity for item in cart)
     return render(request, 'order_create.html',
-                  {'cart': cart, 'form': form})
+                  {'cart': cart, 'total_price': total_price, 'form': form})
 
 def statistic_view(request):
     #products = Product.objects.all()

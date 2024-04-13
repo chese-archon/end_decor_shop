@@ -31,6 +31,9 @@ class Cart(object):
             item['total_price'] = item['price'] * item['quantity']
             yield item
 
+    def __del__(self):
+        del self
+
     def add(self, product, quantity=1, update_quantity=False):
         """
         Добавить продукт в корзину или обновить его количество.
@@ -64,3 +67,4 @@ class Cart(object):
         # удаление корзины из сессии
         del self.session[settings.CART_SESSION_ID]
         self.session.modified = True
+

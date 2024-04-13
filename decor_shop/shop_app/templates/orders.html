@@ -2,11 +2,14 @@
 
 {% block content %}
     <h1>Thank you</h1>
-    <p>Your order has been successfully completed. Your order number is
+    <p>Your order has been successfully completed. <br><br>Your order number is
         <strong>{{ order.id }}</strong>.</p>
+    <p> Итог <strong>{{ total_price }}</strong>.</p>
 {% endblock %}
 
-<a href="{% url 'decor' %}"> К покупкам </a>
+
+<a href="{% url 'orders' %}" class="button"> Мои заказы <br><br> </a>
+<a href="{% url 'decor' %}" class="button"> К покупкам </a>
 
 </body>
 </html>

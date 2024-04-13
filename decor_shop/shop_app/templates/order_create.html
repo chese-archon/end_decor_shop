@@ -1,18 +1,19 @@
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
-    <h1>Checkout</h1>
+    <h1> Оформление заказа </h1>
     <div class="order-info">
-        <h3>Your order</h3>
+        <h3> Ваш заказ </h3>
+        <p> Text </p>
         <ul>
             {% for item in cart %}
                 <li>
                     {{ item.quantity }}x {{ item.product.name }}
-                    <span>${{ item.total_price }}</span>
+                    <span>Цена за штуку ${{ item.product.price }}</span>
                 </li>
             {% endfor %}
         </ul>
-        <p>Total: ${{ cart.get_total_price }}</p>
+        <p>Total: ${{ total_price }}</p>
     </div>
     <form action="." method="post" class="order-form">
         {{ form.as_p }}

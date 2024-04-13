@@ -36,8 +36,10 @@ urlpatterns = [
     path("adr/", views.adres, name="adr"),
     path("adr", views.adres, name="adr"),
     path('create/', views.order_create, name='order_create'),
-    #path('orders/', views.user_orders, name="orders"),
-    #path('orders', views.user_orders, name="orders"),
+    path('orders/', views.user_orders, name="orders"),
+    path('orders', views.user_orders, name="orders"),
+    path('change_password/', views.change_password, name="change_password"),
+    path('change_password', views.change_password, name="change_password"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
